@@ -27,7 +27,9 @@ export function useShareUrl() {
   }, [])
 
   const buildCompareUrl = useCallback((slugs) => {
-    return `${window.location.origin}${window.location.pathname}#/compare?slugs=${slugs.join(',')}`
+    const safeSlugs = [...new Set((Array.isArray(slugs) ? slugs : []).map(slug => String(slug || '').trim()).filter(Boolean))].slice(0, 4)
+    const params = new URLSearchParams({ slugs: safeSlugs.join(',') })
+    return `${window.location.origin}${window.location.pathname}#/compare?${params.toString()}`
   }, [])
 
   const buildPlaylistShareUrl = useCallback((playlist) => {

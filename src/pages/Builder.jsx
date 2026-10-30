@@ -5,6 +5,11 @@ import './Builder.css'
 
 const ELEMENTS = ['div', 'button', 'span', 'p', 'img']
 const SIZES = [40, 60, 80, 100, 120, 160, 200]
+const normalizeAnimationName = value => String(value || '')
+  .trim()
+  .replace(/[^a-zA-Z0-9_-]+/g, '-')
+  .replace(/^-+|-+$/g, '')
+  .slice(0, 48) || 'my-animation'
 
 export default function Builder() {
   const {
@@ -32,11 +37,11 @@ export default function Builder() {
     const now = new Date().toISOString()
     addCustomAnimation({
       id: `custom-${Date.now()}`,
-      name: builderName,
-      slug: `custom-${builderName.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+      name: normalizeAnimationName(builderName),
+      slug: `custom-${normalizeAnimationName(builderName).toLowerCase()}`,
       category: 'custom',
       tags: ['custom', 'builder'],
-      description: `Custom: ${builderName}`,
+      description: `Custom: ${normalizeAnimationName(builderName)}`,
       longDescription: `A custom animation built with the CSS Motion Builder. Duration: ${builderDuration}ms, Easing: ${builderEasing}.`,
       addedAt: now, updatedAt: now, author: 'Builder',
       browserSupport: { chrome: 43, firefox: 16, safari: 9, edge: 12 },
@@ -61,7 +66,7 @@ export default function Builder() {
             <h3 className="builder-section-title">Animation</h3>
             <div className="builder-field">
               <label className="builder-label">Name</label>
-              <input className="builder-input" value={builderName} onChange={e => setBuilderName(e.target.value)} />
+              <input className="builder-input" value={builderName} maxLength={64} onChange={e => setBuilderName(normalizeAnimationName(e.target.value))} />
             </div>
             <div className="builder-field">
               <label className="builder-label">Duration: {builderDuration}ms</label>
