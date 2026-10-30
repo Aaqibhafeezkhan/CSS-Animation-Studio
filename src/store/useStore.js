@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid'
 import Fuse from 'fuse.js'
 import ALL_ANIMATIONS from '../animations/index.js'
 
-const STORE_VERSION = 1
+const STORE_VERSION = 2
 
 const createAnimationsSlice = (set, get) => ({
   animations: ALL_ANIMATIONS,
@@ -503,10 +503,34 @@ const useStore = create(
         customAnimations: state.customAnimations,
       }),
       migrate: (persistedState, version) => {
-        if (version === 0) {
-          return { ...persistedState, customAnimations: [], fontSizeBase: 16 }
+        const source = persistedState && typeof persistedState === 'object' ? persistedState : {}
+        const customAnimations = Array.isArray(source.customAnimations)
+          ? source.customAnimations.filter(animation => animation && typeof animation.id === 'string' && typeof animation.name === 'string' && typeof animation.css === 'string').slice(0, 200)
+          : []
+        const validIds = new Set([...ALL_ANIMATIONS, ...customAnimations].map(animation => animation.id))
+        const uniqueIds = values => [...new Set(Array.isArray(values) ? values.filter(id => typeof id === 'string' && validIds.has(id)) : [])]
+        const playlists = (Array.isArray(source.playlists) ? source.playlists : [])
+          .filter(playlist => playlist && typeof playlist.id === 'string' && typeof playlist.name === 'string')
+          .slice(0, 50)
+          .map(playlist => ({ ...playlist, name: playlist.name.slice(0, 80), items: uniqueIds(playlist.items).slice(0, 100) }))
+        const history = (Array.isArray(source.history) ? source.history : [])
+          .filter(entry => entry && typeof entry.id === 'string' && validIds.has(entry.id))
+          .slice(0, 30)
+          .map(entry => ({ id: entry.id, timestamp: Number.isFinite(Date.parse(entry.timestamp)) ? entry.timestamp : new Date().toISOString() }))
+        const customVars = Object.fromEntries(Object.entries(source.customVars || {})
+          .filter(([key, value]) => key.startsWith('--') && typeof value === 'string' && value.length <= 120))
+        return {
+          ...source,
+          theme: source.theme === 'light' ? 'light' : 'dark',
+          customAnimations,
+          favorites: uniqueIds(source.favorites),
+          history,
+          compareList: uniqueIds(source.compareList).slice(0, 4),
+          playlists,
+          customVars,
+          savedPresets: Array.isArray(source.savedPresets) ? source.savedPresets.slice(0, 30) : [],
+          fontSizeBase: Number.isFinite(Number(source.fontSizeBase)) ? Math.min(20, Math.max(12, Number(source.fontSizeBase))) : 16,
         }
-        return persistedState
       },
     }
   )

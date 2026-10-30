@@ -132,6 +132,21 @@ The application is configured as a PWA with automatic updates and cached static 
 
 The application includes an in-app **Documentation** section covering getting started, animation categories, performance guidance, theming, the Builder, keyboard shortcuts, CSS importing, and PWA installation.
 
+## Deployment
+
+The project is a static Vite application and can be deployed to GitHub Pages, Netlify, or Vercel. The Vite configuration uses a relative asset base and the PWA manifest uses a relative start URL and icon path, so the generated build can be hosted from a repository subpath.
+
+```bash
+npm ci
+npm test -- --run
+npm run build
+npm run preview
+```
+
+Publish the generated `dist/` directory. For GitHub Pages, build locally and publish `dist/` using the repository's configured Pages publishing method. Netlify and Vercel use the included configuration files. No GitHub Actions workflow is required. After publishing, verify the app route, manifest, icon, and a nested hash route; clear the browser's service-worker cache when checking a new release.
+
+The performance and complexity scores shown in the studio are curated metadata, not live browser benchmark measurements.
+
 ## Contributing
 
 Keep changes focused on the existing architecture and conventions. Use the repository's existing testing and build commands when changing behaviour, and keep animation definitions consistent with the structures already used under `src/animations`.
