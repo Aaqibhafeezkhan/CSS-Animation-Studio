@@ -134,7 +134,7 @@ The application includes an in-app **Documentation** section covering getting st
 
 ## Deployment
 
-The project is a static Vite application and can be deployed to GitHub Pages, Netlify, or Vercel. The Vite configuration uses a relative asset base and the PWA manifest uses a relative start URL and icon path, so the generated build can be hosted from a repository subpath.
+The application is deployed to GitHub Pages from the `main` branch by GitHub Actions. Pull requests run the test suite and production build; merges to `main` publish the generated `dist/` directory.
 
 ```bash
 npm ci
@@ -143,9 +143,7 @@ npm run build
 npm run preview
 ```
 
-Publish the generated `dist/` directory. For GitHub Pages, build locally and publish `dist/` using the repository's configured Pages publishing method. Netlify and Vercel use the included configuration files. No GitHub Actions workflow is required. After publishing, verify the app route, manifest, icon, and a nested hash route; clear the browser's service-worker cache when checking a new release.
-
-The performance and complexity scores shown in the studio are curated metadata, not live browser benchmark measurements.
+The Vite configuration and PWA manifest use relative paths so the application works at the repository Pages URL. The performance and complexity scores shown in the studio are curated metadata, not live browser benchmark measurements.
 
 ## Contributing
 
